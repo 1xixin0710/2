@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('注册')}"></head>
+<body class="auth-page">
+<main class="auth-layout">
+    <section class="auth-context">
+        <a class="brand brand-light" th:href="@{/login}">
+            <span class="brand-mark brand-mark-text">DUT</span>
+            <span class="brand-copy"><strong>大工校园二手</strong><small>校园闲置信息站</small></span>
+        </a>
+        <div class="auth-context-copy">
+            <span class="auth-kicker">大工校园二手</span>
+            <h1>创建一个校内账号</h1>
+            <p>填写用户名、昵称和密码。注册完成后即可发布和管理闲置信息。</p>
+        </div>
+        <div class="auth-media" aria-hidden="true">
+            <figure><img th:src="@{/images/keyboard.jpg}" alt=""><figcaption>电子数码</figcaption></figure>
+            <figure><img th:src="@{/images/chair.jpg}" alt=""><figcaption>宿舍生活</figcaption></figure>
+            <figure><img th:src="@{/images/badminton.jpg}" alt=""><figcaption>运动户外</figcaption></figure>
+        </div>
+        <div class="auth-facts">
+            <div><strong>5</strong><span>物品分类</span></div>
+            <div><strong>37</strong><span>初始记录</span></div>
+            <div><strong>1</strong><span>校内交易入口</span></div>
+        </div>
+        <div class="auth-footnote">
+            <i data-lucide="database"></i>
+            <span>发布的信息保存到数据库，可在“我的闲置”继续修改。</span>
+        </div>
+    </section>
+
+    <section class="auth-form-panel">
+        <div class="auth-form-wrap">
+            <p class="auth-kicker">新用户注册</p>
+            <h2>创建账号</h2>
+            <p class="auth-helper">填写用户名、昵称和密码即可完成注册。</p>
+
+            <form class="form-stack" th:action="@{/register}" th:object="${user}" method="post">
+                <label class="field">
+                    <span>用户名</span>
+                    <span class="input-shell">
+                        <i data-lucide="user-round"></i>
+                        <input type="text" th:field="*{username}" autocomplete="username" placeholder="3-20 个字符">
+                    </span>
+                    <small class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+                </label>
+                <label class="field">
+                    <span>昵称</span>
+                    <span class="input-shell">
+                        <i data-lucide="badge"></i>
+                        <input type="text" th:field="*{displayName}" autocomplete="nickname" placeholder="例如：王同学">
+                    </span>
+                    <small class="field-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></small>
+                </label>
+                <label class="field">
+                    <span>密码</span>
+                    <span class="input-shell">
+                        <i data-lucide="lock-keyhole"></i>
+                        <input id="registerPassword" type="password" th:field="*{password}" autocomplete="new-password" placeholder="至少 6 个字符">
+                        <button class="input-action" type="button" data-password-toggle="registerPassword" aria-label="显示密码">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </span>
+                    <small class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                </label>
+                <button class="button button-primary button-block" type="submit">
+                    注册账号 <i data-lucide="arrow-right"></i>
+                </button>
+            </form>
+            <p class="auth-switch">已有账号？<a th:href="@{/login}">返回登录</a></p>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${mode == 'edit' ? '编辑物品' : '发布闲置'})}"></head>
+<body class="app-page">
+<header th:replace="~{fragments :: app-header(${mode == 'edit' ? 'items' : 'create'})}"></header>
+<main class="app-main">
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <section class="page-heading">
+        <div>
+            <p class="breadcrumb">大工校园二手 / <span th:text="${mode == 'edit' ? '编辑物品' : '发布闲置'}">发布闲置</span></p>
+            <h1 th:text="${mode == 'edit' ? '编辑物品信息' : '发布闲置'}">发布闲置</h1>
+            <p class="page-summary">填写物品情况、交易方式和联系方式，带星号的项目必须填写。</p>
+        </div>
+        <a class="button button-ghost" th:href="@{/items}"><i data-lucide="arrow-left"></i> 返回列表</a>
+    </section>
+
+    <form class="editor-layout" th:action="${mode == 'edit' ? '/items/' + item.id : '/items'}"
+          th:object="${item}" method="post">
+        <div class="form-panel">
+            <section class="form-section">
+                <div class="form-section-head">
+                    <h2>物品信息</h2>
+                    <p>名称尽量写清型号，描述里说明使用痕迹和配件。</p>
+                </div>
+                <div class="form-grid">
+                    <label class="field span-2">
+                        <span>物品名称 <em>*</em></span>
+                        <input type="text" th:field="*{title}" placeholder="例如：MacBook Air M1 8+256G">
+                        <small class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                    </label>
+                    <label class="field span-2">
+                        <span>物品描述 <em>*</em></span>
+                        <textarea th:field="*{description}" rows="5" placeholder="说明购买时间、使用情况、配件和转让原因"></textarea>
+                        <small class="field-hint">最多 1000 个字符，不需要填写个人隐私。</small>
+                        <small class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+                    </label>
+                    <label class="field">
+                        <span>物品分类 <em>*</em></span>
+                        <select th:field="*{category}">
+                            <option value="">请选择分类</option>
+                            <option th:each="category : ${categories}" th:value="${category}" th:text="${category}">电子数码</option>
+                        </select>
+                        <small class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small>
+                    </label>
+                    <label class="field">
+                        <span>转让价格 <em>*</em></span>
+                        <span class="input-prefix"><b>¥</b><input type="number" th:field="*{price}" min="0.01" step="0.01" placeholder="0.00"></span>
+                        <small class="field-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></small>
+                    </label>
+                </div>
+
+                <fieldset class="field radio-field span-2">
+                    <legend>物品成色 <em>*</em></legend>
+                    <div class="radio-row">
+                        <label th:each="condition : ${conditions}">
+                            <input type="radio" th:field="*{itemCondition}" th:value="${condition}">
+                            <span th:text="${condition}">九成新</span>
+                        </label>
+                    </div>
+                    <small class="field-error" th:if="${#fields.hasErrors('itemCondition')}" th:errors="*{itemCondition}"></small>
+                </fieldset>
+            </section>
+
+            <section class="form-section">
+                <div class="form-section-head">
+                    <h2>交易安排</h2>
+                    <p>地点和时间写清楚，方便对方判断是否方便。</p>
+                </div>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>交易地点 <em>*</em></span>
+                        <select th:field="*{tradeLocation}">
+                            <option value="">请选择地点</option>
+                            <option th:each="location : ${locations}" th:value="${location}" th:text="${location}">学苑书院</option>
+                        </select>
+                        <small class="field-error" th:if="${#fields.hasErrors('tradeLocation')}" th:errors="*{tradeLocation}"></small>
+                    </label>
+                    <label class="field">
+                        <span>发布时间 <em>*</em></span>
+                        <input type="datetime-local" th:field="*{publishTime}">
+                        <small class="field-error" th:if="${#fields.hasErrors('publishTime')}" th:errors="*{publishTime}"></small>
+                    </label>
+                    <fieldset class="field checkbox-field span-2">
+                        <legend>交付方式 <em>*</em></legend>
+                        <div class="check-row">
+                            <label th:each="option : ${deliveryOptions}">
+                                <input type="checkbox" th:field="*{deliveryChoices}" th:value="${option}">
+                                <span th:text="${option}">自提</span>
+                            </label>
+                        </div>
+                        <small class="field-error" th:if="${#fields.hasErrors('deliveryChoices')}" th:errors="*{deliveryChoices}"></small>
+                    </fieldset>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <div class="form-section-head">
+                    <h2>联系信息</h2>
+                    <p>只填写愿意公开的联系方式。</p>
+                </div>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>发布人 <em>*</em></span>
+                        <input type="text" th:field="*{sellerName}" placeholder="如何称呼你">
+                        <small class="field-error" th:if="${#fields.hasErrors('sellerName')}" th:errors="*{sellerName}"></small>
+                    </label>
+                    <label class="field">
+                        <span>联系方式 <em>*</em></span>
+                        <input type="text" th:field="*{contact}" placeholder="微信号、QQ 或手机号">
+                        <small class="field-error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></small>
+                    </label>
+                    <label class="field">
+                        <span>物品状态 <em>*</em></span>
+                        <select th:field="*{status}">
+                            <option th:each="status : ${statuses}" th:value="${status}" th:text="${status}">在售</option>
+                        </select>
+                        <small class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></small>
+                    </label>
+                </div>
+            </section>
+        </div>
+
+        <aside class="editor-aside">
+            <div class="aside-panel">
+                <span class="aside-label">配图预览</span>
+                <h2>分类示例图</h2>
+                <p>发布页按分类显示示例图，不额外收集本地文件。</p>
+                <div class="image-preview">
+                    <img th:src="${item.imageUrl ?: '/images/laptop.jpg'}" alt="物品配图预览">
+                </div>
+            </div>
+            <div class="aside-panel">
+                <span class="aside-label">填写建议</span>
+                <ul class="plain-list compact">
+                    <li><i data-lucide="check"></i><span>写明型号、尺寸或版本。</span></li>
+                    <li><i data-lucide="check"></i><span>保留真实成色描述。</span></li>
+                    <li><i data-lucide="check"></i><span>交付方式至少选择一项。</span></li>
+                </ul>
+            </div>
+            <div class="editor-actions">
+                <button class="button button-primary button-block" type="submit">
+                    <i data-lucide="save"></i>
+                    <span th:text="${mode == 'edit' ? '保存修改' : '发布记录'}">发布记录</span>
+                </button>
+                <a class="button button-ghost button-block" th:href="@{/items}">取消</a>
+            </div>
+        </aside>
+    </form>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

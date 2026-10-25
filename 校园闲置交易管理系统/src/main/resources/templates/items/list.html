@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('我的闲置')}"></head>
+<body class="app-page">
+<header th:replace="~{fragments :: app-header('items')}"></header>
+<main class="app-main">
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <section class="page-heading">
+        <div>
+            <p class="breadcrumb">大工校园二手 / 闲置列表</p>
+            <h1>闲置列表</h1>
+            <p class="page-summary">按关键词、分类和状态查找物品，维护价格与交易进度。</p>
+        </div>
+        <a class="button button-primary" th:href="@{/items/new}">
+            <i data-lucide="camera-plus"></i> 发布闲置
+        </a>
+    </section>
+
+    <form class="filter-bar" th:action="@{/items}" th:object="${query}" method="get">
+        <label class="search-field">
+            <i data-lucide="search"></i>
+            <input type="search" th:field="*{keyword}" placeholder="搜索名称、描述或交易地点">
+        </label>
+        <label class="select-field">
+            <select th:field="*{category}" aria-label="物品分类">
+                <option value="">全部分类</option>
+                <option th:each="category : ${categories}" th:value="${category}" th:text="${category}">电子数码</option>
+            </select>
+        </label>
+        <label class="select-field">
+            <select th:field="*{status}" aria-label="交易状态">
+                <option value="">全部状态</option>
+                <option th:each="status : ${statuses}" th:value="${status}" th:text="${status}">在售</option>
+            </select>
+        </label>
+        <button class="button button-primary" type="submit"><i data-lucide="search"></i> 查询</button>
+        <a class="button button-ghost" th:href="@{/items}"><i data-lucide="rotate-ccw"></i> 清除</a>
+    </form>
+
+    <section class="listing-section">
+        <div class="listing-summary">
+            <p>查询结果 <strong th:text="${#lists.size(items)}">30</strong> 条</p>
+            <span>按状态和发布时间排序</span>
+        </div>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(items)}">
+            <span><i data-lucide="search-x"></i></span>
+            <h2>没有符合条件的记录</h2>
+            <p>更换关键词或清除筛选条件后重新查询。</p>
+            <a class="button button-secondary button-sm" th:href="@{/items}">查看全部</a>
+        </div>
+
+        <div class="table-wrap inventory-table-wrap" th:unless="${#lists.isEmpty(items)}">
+            <table class="data-table inventory-table">
+                <thead>
+                <tr>
+                    <th>物品信息</th>
+                    <th>分类</th>
+                    <th>成色</th>
+                    <th>价格</th>
+                    <th>交易地点</th>
+                    <th>状态</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td>
+                        <div class="inventory-item">
+                            <img th:src="${item.imageUrl}" th:alt="${item.title}">
+                            <div>
+                                <strong><a th:href="@{/items/{id}(id=${item.id})}" th:text="${item.title}">MacBook Air M1</a></strong>
+                                <p th:text="${item.description}">物品描述</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="category-tag" th:text="${item.category}">电子数码</span></td>
+                    <td th:text="${item.itemCondition}">九成新</td>
+                    <td class="price-cell" th:text="${'¥ ' + #numbers.formatDecimal(item.price, 1, 2)}">¥ 3,899.00</td>
+                    <td th:text="${item.tradeLocation}">学苑书院</td>
+                    <td><span class="status-badge" th:classappend="${item.status == '在售' ? 'status-live' : (item.status == '已预订' ? 'status-reserved' : 'status-done')}" th:text="${item.status}">在售</span></td>
+                    <td class="time-cell" th:text="${#temporals.format(item.publishTime, 'MM-dd HH:mm')}">10-27 18:30</td>
+                    <td>
+                        <div class="row-actions">
+                            <a class="icon-button bordered" th:href="@{/items/{id}(id=${item.id})}" aria-label="查看详情" title="查看详情">
+                                <i data-lucide="eye"></i>
+                            </a>
+                            <a class="icon-button bordered" th:if="${item.status == '在售'}"
+                               th:href="@{/orders/checkout/{id}(id=${item.id})}" aria-label="立即购买" title="立即购买">
+                                <i data-lucide="shopping-bag"></i>
+                            </a>
+                            <a class="icon-button bordered" th:href="@{/items/{id}/edit(id=${item.id})}" aria-label="编辑" title="编辑">
+                                <i data-lucide="pencil-line"></i>
+                            </a>
+                            <button class="icon-button bordered danger" type="button"
+                                    data-delete-item
+                                    th:attr="data-id=${item.id},data-title=${item.title}"
+                                    aria-label="删除" title="删除">
+                                <i data-lucide="trash-2"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<dialog class="confirm-dialog" id="deleteDialog">
+    <form method="post" id="deleteForm">
+        <span class="dialog-icon"><i data-lucide="trash-2"></i></span>
+        <h2>删除这条记录？</h2>
+        <p>“<strong id="deleteItemTitle"></strong>”删除后无法恢复。</p>
+        <div class="dialog-actions">
+            <button class="button button-ghost" type="button" data-dialog-close>取消</button>
+            <button class="button button-danger" type="submit">删除记录</button>
+        </div>
+    </form>
+</dialog>
+
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      tracking-modes: cookie
+
+spring:
+  application:
+    name: campus-market
+  datasource:
+    url: jdbc:h2:mem:campus_market;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+  thymeleaf:
+    cache: false
+  h2:
+    console:
+      enabled: false
+      path: /h2-console
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.dlut.campusmarket.model
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.dlut.campusmarket.mapper: info

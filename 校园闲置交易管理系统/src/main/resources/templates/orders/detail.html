@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('订单详情')}"></head>
+<body class="app-page">
+<header th:replace="~{fragments :: app-header('orders')}"></header>
+<main class="app-main">
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <section class="page-heading">
+        <div>
+            <p class="breadcrumb">大工校园二手 / <a th:href="@{/orders}">我的订单</a> / 订单详情</p>
+            <h1>订单详情</h1>
+            <p class="page-summary" th:text="${'订单号 ' + order.orderNo}">订单号 CM20261025</p>
+        </div>
+        <a class="button button-ghost" th:href="@{/orders}"><i data-lucide="arrow-left"></i> 返回订单</a>
+    </section>
+
+    <section class="order-detail">
+        <div class="order-detail-main">
+            <div class="order-status-band">
+                <div>
+                    <span>当前状态</span>
+                    <strong th:text="${order.status}">待付款</strong>
+                </div>
+                <p th:if="${order.status == '待付款'}">请先联系卖家确认物品，再选择付款方式完成交易。</p>
+                <p th:if="${order.status == '已付款'}">付款状态已记录，请当面验货后确认收货。</p>
+                <p th:if="${order.status == '已完成'}">该订单已完成，物品状态已同步更新。</p>
+                <p th:if="${order.status == '已取消'}">订单已取消，物品已经重新上架。</p>
+            </div>
+
+            <article class="order-item">
+                <img th:src="${order.itemImageUrl}" th:alt="${order.itemTitle}">
+                <div>
+                    <span class="detail-kicker">交易物品</span>
+                    <h2 th:text="${order.itemTitle}">物品名称</h2>
+                    <p th:text="${order.deliveryMethod + ' · ' + order.tradeLocation}">自提 · 学苑书院</p>
+                    <a class="text-link" th:href="@{/items/{id}(id=${order.itemId})}">查看物品详情</a>
+                </div>
+                <strong class="order-amount" th:text="${'¥ ' + #numbers.formatDecimal(order.amount, 1, 2)}">¥ 0.00</strong>
+            </article>
+
+            <div class="order-info-grid">
+                <div>
+                    <span>付款方式</span>
+                    <strong th:text="${order.paymentMethod}">校内当面付款</strong>
+                </div>
+                <div>
+                    <span>买家联系方式</span>
+                    <strong th:text="${order.contact}">微信：buyer</strong>
+                </div>
+                <div>
+                    <span>卖家</span>
+                    <strong th:text="${order.sellerName}">林同学</strong>
+                </div>
+                <div>
+                    <span>卖家联系方式</span>
+                    <strong th:text="${order.sellerContact}">微信：seller</strong>
+                </div>
+                <div>
+                    <span>下单时间</span>
+                    <strong th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">2026-10-25 18:00</strong>
+                </div>
+                <div th:if="${order.paidAt}">
+                    <span>付款记录时间</span>
+                    <strong th:text="${#temporals.format(order.paidAt, 'yyyy-MM-dd HH:mm')}">2026-10-25 18:10</strong>
+                </div>
+            </div>
+
+            <div class="order-note" th:if="${order.note}">
+                <span>交易备注</span>
+                <p th:text="${order.note}">备注内容</p>
+            </div>
+        </div>
+
+        <aside class="order-actions-panel">
+            <span class="aside-label">付款与收货</span>
+            <div class="order-pay-total">
+                <span>订单金额</span>
+                <strong th:text="${'¥ ' + #numbers.formatDecimal(order.amount, 1, 2)}">¥ 0.00</strong>
+            </div>
+
+            <div class="payment-warning" th:if="${order.status == '待付款'}">
+                <i data-lucide="info"></i>
+                <p>本系统不代收资金。请与卖家核对身份和物品后完成付款，再点击下方确认。</p>
+            </div>
+
+            <form th:if="${order.status == '待付款'}" th:action="@{/orders/{id}/pay(id=${order.id})}" method="post">
+                <button class="button button-primary button-block" type="submit">
+                    <i data-lucide="wallet-cards"></i> 确认已付款
+                </button>
+            </form>
+            <form th:if="${order.status == '已付款'}" th:action="@{/orders/{id}/complete(id=${order.id})}" method="post">
+                <button class="button button-primary button-block" type="submit">
+                    <i data-lucide="package-check"></i> 确认收货
+                </button>
+            </form>
+            <form th:if="${order.status == '待付款'}" th:action="@{/orders/{id}/cancel(id=${order.id})}" method="post">
+                <button class="button button-ghost button-block" type="submit">取消订单</button>
+            </form>
+            <a class="button button-ghost button-block" th:href="@{/items}">继续浏览物品</a>
+        </aside>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

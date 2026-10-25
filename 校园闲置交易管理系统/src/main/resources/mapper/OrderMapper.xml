@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dlut.campusmarket.mapper.OrderMapper">
+
+    <sql id="orderColumns">
+        id, order_no, item_id, item_title, item_image_url, amount,
+        buyer_username, buyer_name, seller_name, seller_contact,
+        delivery_method, trade_location, payment_method, contact, note,
+        status, created_at, paid_at, completed_at
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders (
+            order_no, item_id, item_title, item_image_url, amount,
+            buyer_username, buyer_name, seller_name, seller_contact,
+            delivery_method, trade_location, payment_method, contact, note, status
+        )
+        VALUES (
+            #{orderNo}, #{itemId}, #{itemTitle}, #{itemImageUrl}, #{amount},
+            #{buyerUsername}, #{buyerName}, #{sellerName}, #{sellerContact},
+            #{deliveryMethod}, #{tradeLocation}, #{paymentMethod}, #{contact}, #{note}, #{status}
+        )
+    </insert>
+
+    <select id="findByIdAndBuyer" resultType="Order">
+        SELECT <include refid="orderColumns"/>
+        FROM orders
+        WHERE id = #{id} AND buyer_username = #{buyerUsername}
+    </select>
+
+    <select id="findByBuyer" resultType="Order">
+        SELECT <include refid="orderColumns"/>
+        FROM orders
+        WHERE buyer_username = #{buyerUsername}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="markPaid">
+        UPDATE orders
+        SET status = '已付款', paid_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND buyer_username = #{buyerUsername} AND status = '待付款'
+    </update>
+
+    <update id="markCancelled">
+        UPDATE orders
+        SET status = '已取消'
+        WHERE id = #{id} AND buyer_username = #{buyerUsername} AND status = '待付款'
+    </update>
+
+    <update id="markCompleted">
+        UPDATE orders
+        SET status = '已完成', completed_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND buyer_username = #{buyerUsername} AND status = '已付款'
+    </update>
+</mapper>

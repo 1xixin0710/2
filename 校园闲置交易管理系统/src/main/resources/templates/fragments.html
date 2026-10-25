@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' · 大工校园二手'">大工校园二手</title>
+    <link rel="icon" type="image/png" th:href="@{/images/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/lucide.min.js}" defer></script>
+    <script th:src="@{/js/app.js}" defer></script>
+</head>
+<body>
+<header class="app-header" th:fragment="app-header(active)">
+    <div class="header-inner">
+        <a class="brand" th:href="@{/dashboard}" aria-label="大工校园二手首页">
+            <span class="brand-mark brand-mark-text">DUT</span>
+            <span class="brand-copy">
+                <strong>大工校园二手</strong>
+                <small>校园闲置信息站</small>
+            </span>
+        </a>
+
+        <nav class="main-nav" aria-label="主导航">
+            <a th:href="@{/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">
+                <i data-lucide="house"></i><span>首页</span>
+            </a>
+            <a th:href="@{/items}" th:classappend="${active == 'items'} ? 'active'">
+                <i data-lucide="notebook-tabs"></i><span>闲置列表</span>
+            </a>
+            <a th:href="@{/orders}" th:classappend="${active == 'orders'} ? 'active'">
+                <i data-lucide="receipt-text"></i><span>我的订单</span>
+            </a>
+            <a th:href="@{/items/new}" th:classappend="${active == 'create'} ? 'active'">
+                <i data-lucide="camera-plus"></i><span>发布</span>
+            </a>
+        </nav>
+
+        <div class="header-user">
+            <span class="avatar" th:text="${#strings.substring(session.authUser.displayName, 0, 1)}">林</span>
+            <div class="user-copy">
+                <strong th:text="${session.authUser.displayName}">林同学</strong>
+                <small th:text="${'@' + session.authUser.username}">student</small>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button class="icon-button" type="submit" aria-label="退出登录" title="退出登录">
+                    <i data-lucide="log-out"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<div th:fragment="flash" class="flash-stack" aria-live="polite">
+    <div class="flash flash-success" th:if="${success}">
+        <i data-lucide="circle-check"></i><span th:text="${success}">操作成功</span>
+    </div>
+    <div class="flash flash-error" th:if="${error}">
+        <i data-lucide="circle-alert"></i><span th:text="${error}">操作失败</span>
+    </div>
+</div>
+
+<div th:fragment="scripts">
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            if (window.lucide) window.lucide.createIcons();
+        });
+    </script>
+</div>
+</body>
+</html>

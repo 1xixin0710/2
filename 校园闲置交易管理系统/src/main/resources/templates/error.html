@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('页面提示')}"></head>
+<body class="error-page">
+<main class="error-card">
+    <span class="brand-mark"><i data-lucide="store"></i></span>
+    <span class="auth-kicker">页面提示</span>
+    <h1 th:text="${status ?: 500}">500</h1>
+    <p th:text="${message ?: '页面暂时无法显示，请稍后再试。'}">页面暂时无法显示</p>
+    <a class="button button-primary" th:href="@{/dashboard}">返回工作台</a>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

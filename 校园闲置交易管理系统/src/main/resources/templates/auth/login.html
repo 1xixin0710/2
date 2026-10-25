@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('登录')}"></head>
+<body class="auth-page">
+<main class="auth-layout">
+    <section class="auth-context">
+        <a class="brand brand-light" th:href="@{/login}">
+            <span class="brand-mark brand-mark-text">DUT</span>
+            <span class="brand-copy"><strong>大工校园二手</strong><small>校园闲置信息站</small></span>
+        </a>
+        <div class="auth-context-copy">
+            <span class="auth-kicker">大连理工大学 · 校园闲置信息</span>
+            <h1>校内闲置，一眼看完</h1>
+            <p>电脑、教材和宿舍用品集中展示。约在校内见面，验货确认后再付款。</p>
+        </div>
+        <div class="auth-media" aria-hidden="true">
+            <figure><img th:src="@{/images/laptop.jpg}" alt=""><figcaption>电子数码</figcaption></figure>
+            <figure><img th:src="@{/images/books.jpg}" alt=""><figcaption>书籍资料</figcaption></figure>
+            <figure><img th:src="@{/images/bike.jpg}" alt=""><figcaption>运动户外</figcaption></figure>
+        </div>
+        <div class="auth-footnote">
+            <i data-lucide="shield-check"></i>
+            <span>账号仅用于校内闲置发布和交易状态维护。</span>
+        </div>
+    </section>
+
+    <section class="auth-form-panel">
+        <div class="auth-form-wrap">
+            <div th:replace="~{fragments :: flash}"></div>
+            <p class="auth-kicker">大工校园二手</p>
+            <h2>账号登录</h2>
+            <p class="auth-helper">登录后发布闲置，或管理已有物品信息。</p>
+
+            <form class="form-stack" th:action="@{/login}" method="post">
+                <label class="field">
+                    <span>用户名</span>
+                    <span class="input-shell">
+                        <i data-lucide="user-round"></i>
+                        <input type="text" name="username" autocomplete="username" placeholder="请输入用户名" required autofocus>
+                    </span>
+                </label>
+                <label class="field">
+                    <span>密码</span>
+                    <span class="input-shell">
+                        <i data-lucide="lock-keyhole"></i>
+                        <input id="loginPassword" type="password" name="password" autocomplete="current-password" placeholder="请输入密码" required>
+                        <button class="input-action" type="button" data-password-toggle="loginPassword" aria-label="显示密码">
+                            <i data-lucide="eye"></i>
+                        </button>
+                    </span>
+                </label>
+                <button class="button button-primary button-block" type="submit">
+                    登录 <i data-lucide="arrow-right"></i>
+                </button>
+            </form>
+
+            <p class="auth-switch">还没有账号？<a th:href="@{/register}">注册新账号</a></p>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

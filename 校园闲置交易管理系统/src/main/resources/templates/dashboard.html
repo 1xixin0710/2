@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('首页')}"></head>
+<body class="app-page">
+<header th:replace="~{fragments :: app-header('dashboard')}"></header>
+<main class="app-main market-main">
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <section class="market-toolbar">
+        <div>
+            <span class="market-kicker">大连理工大学 · 校园闲置信息</span>
+            <h1>大工校园二手市场</h1>
+            <p>电脑、教材、宿舍用品和运动装备，均来自校内同学发布。</p>
+        </div>
+        <form class="market-search" th:action="@{/items}" method="get">
+            <i data-lucide="search"></i>
+            <input type="search" name="keyword" placeholder="搜物品名称、描述或交易地点">
+            <button type="submit">搜索</button>
+        </form>
+    </section>
+
+    <section class="market-switcher" aria-label="物品分类与状态">
+        <div class="market-categories">
+            <a class="is-current" th:href="@{/items}">全部</a>
+            <a th:each="entry : ${categoryCounts}"
+               th:href="@{/items(category=${entry.key})}"
+               th:text="${entry.key}">电子数码</a>
+        </div>
+        <div class="market-totals">
+            <span><strong th:text="${totalCount}">37</strong> 件闲置</span>
+            <span><strong th:text="${onSaleCount}">26</strong> 件在售</span>
+            <span><strong th:text="${completedCount}">6</strong> 件已完成</span>
+        </div>
+    </section>
+
+    <div class="market-layout">
+        <section class="market-feed">
+            <div class="market-feed-heading">
+                <div>
+                    <h2>最新发布</h2>
+                    <p>按在售状态和发布时间排序</p>
+                </div>
+                <a class="market-more" th:href="@{/items}">查看全部 <i data-lucide="chevron-right"></i></a>
+            </div>
+            <div class="listing-card-grid">
+                <article class="listing-card" th:each="item : ${latestItems}">
+                    <div class="listing-photo">
+                        <img th:src="${item.imageUrl}" th:alt="${item.title}" loading="lazy">
+                        <span class="listing-status"
+                              th:classappend="${item.status == '在售' ? 'status-live' : (item.status == '已预订' ? 'status-reserved' : 'status-done')}"
+                              th:text="${item.status}">在售</span>
+                    </div>
+                    <div class="listing-body">
+                        <div class="listing-price" th:text="${'¥ ' + #numbers.formatDecimal(item.price, 1, 0)}">¥ 3899</div>
+                        <h3><a th:href="@{/items/{id}(id=${item.id})}" th:text="${item.title}">MacBook Air M1</a></h3>
+                        <p class="listing-desc" th:text="${item.description}">物品描述</p>
+                        <div class="listing-tags">
+                            <span th:text="${item.category}">电子数码</span>
+                            <span th:text="${item.itemCondition}">九成新</span>
+                        </div>
+                        <div class="listing-foot">
+                            <div class="listing-meta">
+                                <strong th:text="${item.sellerName}">林同学</strong>
+                                <span th:text="${item.tradeLocation}">学苑书院</span>
+                            </div>
+                            <time th:text="${#temporals.format(item.publishTime, 'MM-dd HH:mm')}">10-27 18:30</time>
+                            <a th:href="@{/items/{id}(id=${item.id})}" aria-label="查看并购买" title="查看并购买">
+                                <i data-lucide="shopping-bag"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <aside class="market-aside">
+            <a class="post-entry" th:href="@{/items/new}">
+                <span><i data-lucide="camera-plus"></i></span>
+                <div>
+                    <h2>发布一条闲置</h2>
+                    <p>填写价格、成色和校内取货地点。</p>
+                </div>
+                <i data-lucide="arrow-up-right"></i>
+            </a>
+
+            <section class="market-side-block">
+                <div class="side-block-title">
+                    <h2>分类</h2>
+                    <span th:text="${totalCount + ' 件'}">37 件</span>
+                </div>
+                <a class="side-category"
+                   th:each="entry : ${categoryCounts}"
+                   th:href="@{/items(category=${entry.key})}">
+                    <span th:text="${entry.key}">电子数码</span>
+                    <strong th:text="${entry.value}">11</strong>
+                </a>
+            </section>
+
+            <section class="market-side-block campus-note">
+                <div class="side-block-title">
+                    <h2>交易提示</h2>
+                </div>
+                <ul>
+                    <li>约在图书馆、食堂或宿舍区当面验货。</li>
+                    <li>确认物品无误后再付款，不提前转账。</li>
+                    <li>成交后及时把状态改为“已完成”。</li>
+                </ul>
+            </section>
+        </aside>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

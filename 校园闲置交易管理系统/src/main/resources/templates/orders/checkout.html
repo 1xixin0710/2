@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('确认下单')}"></head>
+<body class="app-page">
+<header th:replace="~{fragments :: app-header('orders')}"></header>
+<main class="app-main">
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <section class="page-heading">
+        <div>
+            <p class="breadcrumb">大工校园二手 / <a th:href="@{/items/{id}(id=${item.id})}">物品详情</a> / 确认下单</p>
+            <h1>确认购买</h1>
+            <p class="page-summary">选择交付和付款方式。下单后物品会保留给当前订单。</p>
+        </div>
+        <a class="button button-ghost" th:href="@{/items/{id}(id=${item.id})}"><i data-lucide="arrow-left"></i> 返回详情</a>
+    </section>
+
+    <div class="checkout-layout">
+        <section class="checkout-panel">
+            <div class="checkout-section-title">
+                <h2>交易信息</h2>
+                <p>联系方式和交易地点会写入订单，便于双方核对。</p>
+            </div>
+
+            <form class="form-stack" th:action="@{/orders/checkout/{id}(id=${item.id})}" th:object="${order}" method="post">
+                <label class="field">
+                    <span>交付方式 <em>*</em></span>
+                    <select th:field="*{deliveryMethod}">
+                        <option th:each="method : ${deliveryMethods}" th:value="${method}" th:text="${method}">自提</option>
+                    </select>
+                    <small class="field-error" th:if="${#fields.hasErrors('deliveryMethod')}" th:errors="*{deliveryMethod}"></small>
+                </label>
+
+                <label class="field">
+                    <span>约定地点 <em>*</em></span>
+                    <input type="text" th:field="*{tradeLocation}" placeholder="例如：学苑书院一楼">
+                    <small class="field-error" th:if="${#fields.hasErrors('tradeLocation')}" th:errors="*{tradeLocation}"></small>
+                </label>
+
+                <label class="field">
+                    <span>你的联系方式 <em>*</em></span>
+                    <input type="text" th:field="*{contact}" placeholder="微信号、QQ 或手机号">
+                    <small class="field-error" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></small>
+                </label>
+
+                <fieldset class="field payment-field">
+                    <legend>付款方式 <em>*</em></legend>
+                    <div class="payment-methods">
+                        <label th:each="method : ${paymentMethods}">
+                            <input type="radio" th:field="*{paymentMethod}" th:value="${method}">
+                            <span>
+                                <strong th:text="${method}">校内当面付款</strong>
+                                <small th:if="${method == '校内当面付款'}">验货后当面支付给卖家</small>
+                                <small th:if="${method != '校内当面付款'}">与卖家核对身份后自行转账</small>
+                            </span>
+                        </label>
+                    </div>
+                    <small class="field-error" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></small>
+                </fieldset>
+
+                <label class="field">
+                    <span>交易备注</span>
+                    <textarea th:field="*{note}" rows="3" placeholder="例如：下课后联系，希望晚上六点后交易"></textarea>
+                    <small class="field-error" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></small>
+                </label>
+
+                <div class="payment-disclaimer">
+                    <i data-lucide="shield-check"></i>
+                    <p>微信和支付宝付款需要你在站外自行转账。本系统只记录付款状态，不代收、不托管资金，也不会自动扣款。</p>
+                </div>
+
+                <button class="button button-primary button-block" type="submit">
+                    <i data-lucide="receipt-text"></i> 提交订单
+                </button>
+            </form>
+        </section>
+
+        <aside class="checkout-summary">
+            <div class="checkout-summary-head">
+                <span>订单物品</span>
+                <strong>1 件</strong>
+            </div>
+            <img th:src="${item.imageUrl}" th:alt="${item.title}">
+            <h2 th:text="${item.title}">物品名称</h2>
+            <p th:text="${item.sellerName + ' · ' + item.tradeLocation}">卖家 · 地点</p>
+            <div class="checkout-total">
+                <span>应付金额</span>
+                <strong th:text="${'¥ ' + #numbers.formatDecimal(item.price, 1, 2)}">¥ 0.00</strong>
+            </div>
+            <div class="checkout-seller">
+                <span>卖家联系方式</span>
+                <strong th:text="${item.contact}">微信：seller</strong>
+            </div>
+        </aside>
+    </div>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${item.title})}"></head>
+<body class="app-page">
+<header th:replace="~{fragments :: app-header('items')}"></header>
+<main class="app-main">
+    <div th:replace="~{fragments :: flash}"></div>
+
+    <section class="page-heading">
+        <div>
+            <p class="breadcrumb">大工校园二手 / <a th:href="@{/items}">闲置列表</a> / 物品详情</p>
+            <h1>物品详情</h1>
+            <p class="page-summary">核对成色、交易地点和卖家联系方式后再下单。</p>
+        </div>
+        <a class="button button-ghost" th:href="@{/items}"><i data-lucide="arrow-left"></i> 返回列表</a>
+    </section>
+
+    <section class="product-detail">
+        <div class="product-detail-media">
+            <img th:src="${item.imageUrl}" th:alt="${item.title}">
+            <span class="listing-status product-status"
+                  th:classappend="${item.status == '在售' ? 'status-live' : (item.status == '已预订' ? 'status-reserved' : 'status-done')}"
+                  th:text="${item.status}">在售</span>
+        </div>
+
+        <div class="product-detail-panel">
+            <p class="detail-kicker" th:text="${item.category + ' · ' + item.itemCondition}">电子数码 · 九成新</p>
+            <h2 th:text="${item.title}">MacBook Air M1</h2>
+            <div class="detail-price" th:text="${'¥ ' + #numbers.formatDecimal(item.price, 1, 2)}">¥ 3,899.00</div>
+            <p class="detail-description" th:text="${item.description}">物品描述</p>
+
+            <div class="product-facts">
+                <div>
+                    <span>交易地点</span>
+                    <strong th:text="${item.tradeLocation}">学苑书院</strong>
+                </div>
+                <div>
+                    <span>交付方式</span>
+                    <strong th:text="${#strings.listJoin(item.deliveryChoices, ' / ')}">自提 / 校内送货</strong>
+                </div>
+                <div>
+                    <span>发布时间</span>
+                    <strong th:text="${#temporals.format(item.publishTime, 'yyyy-MM-dd HH:mm')}">2026-10-27 18:30</strong>
+                </div>
+            </div>
+
+            <div class="seller-strip">
+                <div>
+                    <span>发布人</span>
+                    <strong th:text="${item.sellerName}">林同学</strong>
+                </div>
+                <div>
+                    <span>联系方式</span>
+                    <strong th:text="${item.contact}">微信：mac_lin</strong>
+                </div>
+            </div>
+
+            <div class="purchase-actions" th:if="${item.status == '在售'}">
+                <a class="button button-primary" th:href="@{/orders/checkout/{id}(id=${item.id})}">
+                    <i data-lucide="shopping-bag"></i> 立即购买
+                </a>
+                <a class="button button-ghost" th:href="@{/items/{id}/edit(id=${item.id})}">
+                    <i data-lucide="pencil-line"></i> 编辑信息
+                </a>
+            </div>
+            <div class="unavailable-note" th:unless="${item.status == '在售'}">
+                <i data-lucide="circle-alert"></i>
+                <span th:text="${item.status == '已预订' ? '该物品已有同学下单，暂时不能重复购买。' : '该物品已完成交易，仅供查看。'}">该物品当前不可购买。</span>
+            </div>
+
+            <p class="payment-footnote">
+                下单后会生成订单，付款方式可选择校内当面付款、微信转账或支付宝转账。平台记录付款和收货状态，不代扣资金。
+            </p>
+        </div>
+    </section>
+</main>
+<script th:replace="~{fragments :: scripts}"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dlut.campusmarket.mapper.ItemMapper">
+
+    <sql id="itemColumns">
+        id, title, description, category, price, item_condition, trade_location,
+        delivery_options, publish_time, seller_name, contact, status, image_url, created_at
+    </sql>
+
+    <select id="search" parameterType="ItemQuery" resultType="Item">
+        SELECT <include refid="itemColumns"/>
+        FROM items
+        <where>
+            <if test="keyword != null">
+                AND (
+                    LOWER(title) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                    OR LOWER(description) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                    OR LOWER(trade_location) LIKE CONCAT('%', LOWER(#{keyword}), '%')
+                )
+            </if>
+            <if test="category != null">
+                AND category = #{category}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY
+            CASE status WHEN '在售' THEN 0 WHEN '已预订' THEN 1 ELSE 2 END,
+            publish_time DESC
+    </select>
+
+    <select id="findById" resultType="Item">
+        SELECT <include refid="itemColumns"/>
+        FROM items
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO items (
+            title, description, category, price, item_condition, trade_location,
+            delivery_options, publish_time, seller_name, contact, status, image_url
+        )
+        VALUES (
+            #{title}, #{description}, #{category}, #{price}, #{itemCondition}, #{tradeLocation},
+            #{deliveryOptions}, #{publishTime}, #{sellerName}, #{contact}, #{status}, #{imageUrl}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE items
+        SET title = #{title},
+            description = #{description},
+            category = #{category},
+            price = #{price},
+            item_condition = #{itemCondition},
+            trade_location = #{tradeLocation},
+            delivery_options = #{deliveryOptions},
+            publish_time = #{publishTime},
+            seller_name = #{sellerName},
+            contact = #{contact},
+            status = #{status},
+            image_url = #{imageUrl}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM items WHERE id = #{id}
+    </delete>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM items
+    </select>
+
+    <select id="countByStatus" resultType="int">
+        SELECT COUNT(*) FROM items WHERE status = #{status}
+    </select>
+
+    <update id="changeStatus">
+        UPDATE items
+        SET status = #{next}
+        WHERE id = #{id} AND status = #{expected}
+    </update>
+</mapper>
