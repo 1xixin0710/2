@@ -19,6 +19,9 @@ spring:
 
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: native
+  tomcat:
+    use-relative-redirects: true
 
 logging:
   level:
